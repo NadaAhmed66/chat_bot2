@@ -148,7 +148,10 @@ void openFile(PlatformFile file){
                       child: Container(
                         constraints: const BoxConstraints(minWidth: 88.0, minHeight: 36.0), // min sizes for Material buttons
                         alignment: Alignment.center,
-                        child:  IconButton(onPressed: (){}, icon: Icon(Icons.attach_file, color: Colors.white,))
+                        child:  IconButton(onPressed: (){ 
+                        pickedfile();
+                         getAnswer();
+                        }, icon: Icon(Icons.attach_file, color: Colors.white,))
                       ),
                     ),),
                   Expanded(
