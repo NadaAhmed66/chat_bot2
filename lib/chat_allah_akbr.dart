@@ -26,10 +26,7 @@ Future pickedfile() async{
     type: FileType.custom,
     allowedExtensions: ['pdf'],
   );
-  if (result!=null) 
-  { 
-   return uploadFile (pdf!);
-  }
+ 
 final file=result!.files.first;
   
   setState(() {
