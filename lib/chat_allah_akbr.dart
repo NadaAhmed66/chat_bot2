@@ -61,6 +61,60 @@ Future<void> uploadFile(File file) async {
     print('Error uploading file: $e');
   }
 }
+
+Future questionFromUser() async{
+  final uri=Uri.parse("https://api-chat-with-docs.onrender.com/chatpdf/");
+  List<Map<String,String>>msg=[];
+  for(var i=0;i< -_chatHistory[i].length;i++){
+    msg.add({"content": _chatHistory[i]["message"]});
+  }
+  Map<String,dynamic>request={
+"prompt":{
+  "messages":[msg]
+    }  };
+    final response = await http.post(uri,body: jsonEncode(request));
+    if(response.statusCode==201){
+     print("success sent");
+    }else{
+      print("failed to load a question");
+    };
+}
+Future UrlFromUser() async{
+  final uri=Uri.parse("https://api-chat-with-docs.onrender.com/chaturl/");
+  List<Map<String,String>>msg=[];
+  for(var i=0;i< -_chatHistory[i].length;i++){
+    msg.add({"content": _chatHistory[i]["message"]});
+  }
+  Map<String,dynamic>request={
+"prompt":{
+  "messages":[msg]
+    }  };
+    final response = await http.post(uri,body: jsonEncode(request));
+    if(response.statusCode==201){
+     print("success sent");
+    }else{
+      print("failed to load a question");
+    };
+}
+
+
+
+Future answerfromchat()async{
+
+final uri=Uri.parse("https://api-chat-with-docs.onrender.com/");
+final response= await http.get(uri);
+
+setState(() {
+  _chatHistory.add({
+    "message":json.decode(response.body)["candidates"][0]["content"],
+    "isSender":false
+  });  
+});
+
+_scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,7 +186,7 @@ Future<void> uploadFile(File file) async {
                         borderRadius: BorderRadius.all(Radius.circular(50.0)),
                       ),
                       child: Container(
-                        constraints: const BoxConstraints(minWidth: 88.0, minHeight: 36.0), // min sizes for Material buttons
+                        constraints: const BoxConstraints(minWidth: 70.0, minHeight: 36.0), // min sizes for Material buttons
                         alignment: Alignment.center,
                         child:  IconButton(onPressed: (){
                          pickedfile();
@@ -179,7 +233,7 @@ Future<void> uploadFile(File file) async {
                         borderRadius: BorderRadius.all(Radius.circular(50.0)),
                       ),
                       child: Container(
-                        constraints: const BoxConstraints(minWidth: 88.0, minHeight: 36.0), // min sizes for Material buttons
+                        constraints: const BoxConstraints(minWidth: 70.0, minHeight: 36.0), // min sizes for Material buttons
                         alignment: Alignment.center,
                         child:  IconButton(onPressed: (){
   setState(() {
