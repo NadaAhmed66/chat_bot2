@@ -17,64 +17,50 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   List<Map<String, dynamic>> _chatHistory = [];
-  FilePickerResult? result;
-  PlatformFile? file ;
+  
+  
   File? pdf;
 
-void getAnswer() async {
-  final url = "https://api-chat-with-docs.onrender.com";
-  final uri = Uri.parse(url);
-final header = {'Content-Type': 'multipart/form-data'};
-  List<Map<String, String>> msg = [];
-  for (var i = 0; i < _chatHistory.length; i++) {
-    msg.add({"content": _chatHistory[i]["message"]});
-  }
-
-  final request = http.MultipartRequest("POST", uri);
-  request.headers.addAll(header);
-  request.fields['prompt[messages]'] = jsonEncode(msg);
-  request.fields['temperature'] = '0.25';
-  request.fields['candidateCount'] = '1';
-  request.fields['topP'] = '1';
-  request.fields['topK'] = '1';
-
-  final pdfFile = File(pdf!.path);
-  final pdfLength = await pdfFile.length();
-  final pdfStream = http.ByteStream(pdfFile.openRead());
-  final pdfMultipartFile = http.MultipartFile('fileup', pdfStream, pdfLength,
-      filename: pdfFile.path.split('/').last);
-
-  request.files.add(pdfMultipartFile);
-
-  final response = await request.send();
-  final responseBody = await response.stream.transform(utf8.decoder).join();
-
-  setState(() {
-    _chatHistory.add({
-      "message": jsonDecode(responseBody)["candidates"][0]["content"],
-      "isSender": false,
-    });
-  });
-}
 Future pickedfile() async{
-   result= await FilePicker.platform.pickFiles(
+ final result= await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['pdf'],
   );
-  if (result!=null) return;
-  file =result!.files.first;
+  if (result!=null) 
+  { 
+   return uploadFile (pdf!);
+  }
+final file=result!.files.first;
   
   setState(() {
-    pdf=File(file!.path!);
+    pdf=File(file.path!);
   });
-
+if (result!=null) 
+  { 
+   return uploadFile (pdf!);
+  }
 }
 void openFile(PlatformFile file){
   OpenFile.open(file.path);
 }
- 
-
-
+Future<void> uploadFile(File file) async {
+  var request = http.MultipartRequest('POST', Uri.parse('https://api-chat-with-docs.onrender.com/docs#/default/upload_pdf_upload__post'));
+  request.files.add(await http.MultipartFile.fromPath('fileup', file.path));
+  
+  try {
+    final streamedResponse = await request.send();
+    if (streamedResponse.statusCode == 200) {
+      // File uploaded successfully
+      print('File uploaded');
+    } else {
+      // Handle error
+      print('Error uploading file: ${streamedResponse.reasonPhrase}');
+    }
+  } catch (e) {
+    // Handle error
+    print('Error uploading file: $e');
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,9 +134,9 @@ void openFile(PlatformFile file){
                       child: Container(
                         constraints: const BoxConstraints(minWidth: 88.0, minHeight: 36.0), // min sizes for Material buttons
                         alignment: Alignment.center,
-                        child:  IconButton(onPressed: (){ 
-                        pickedfile();
-                         getAnswer();
+                        child:  IconButton(onPressed: (){
+                         pickedfile();
+                       
                         }, icon: Icon(Icons.attach_file, color: Colors.white,))
                       ),
                     ),),
