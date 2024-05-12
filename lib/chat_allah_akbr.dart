@@ -41,8 +41,8 @@ void openFile(PlatformFile file){
   OpenFile.open(file.path);
 }
 Future<void> uploadFile(File file) async {
-  var request = http.MultipartRequest('POST', Uri.parse('https://api-chat-with-docs.onrender.com/docs#/default/upload_pdf_upload__post'));
-  request.files.add(await http.MultipartFile.fromPath('fileup', file.path));
+  var request = http.MultipartRequest('POST', Uri.parse('https://api-chat-with-docs.onrender.com/upload/'));
+  request.files.add(await http.MultipartFile.fromPath('file', file.path));
   
   try {
     final streamedResponse = await request.send();
@@ -63,11 +63,11 @@ Future questionFromUser() async{
   final uri=Uri.parse("https://api-chat-with-docs.onrender.com/chatpdf/");
   List<Map<String,String>>msg=[];
   for(var i=0;i< -_chatHistory[i].length;i++){
-    msg.add({"content": _chatHistory[i]["message"]});
+    msg.add({"content": _chatHistory[i]["qusetion"]});
   }
   Map<String,dynamic>request={
 "prompt":{
-  "messages":[msg]
+  "question":[msg]
     }  };
     final response = await http.post(uri,body: jsonEncode(request));
     if(response.statusCode==201){
@@ -80,11 +80,11 @@ Future UrlFromUser() async{
   final uri=Uri.parse("https://api-chat-with-docs.onrender.com/chaturl/");
   List<Map<String,String>>msg=[];
   for(var i=0;i< -_chatHistory[i].length;i++){
-    msg.add({"content": _chatHistory[i]["message"]});
+    msg.add({"content": _chatHistory[i]["question"]});
   }
   Map<String,dynamic>request={
 "prompt":{
-  "messages":[msg]
+  "question":[msg]
     }  };
     final response = await http.post(uri,body: jsonEncode(request));
     if(response.statusCode==201){
@@ -237,7 +237,7 @@ _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     if(_chatController.text.isNotEmpty){
       _chatHistory.add({
         
-        "message": _chatController.text,
+        "question": _chatController.text,
         "isSender": true,
       });
       _chatController.clear();
